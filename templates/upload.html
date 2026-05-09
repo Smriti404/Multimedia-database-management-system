@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Upload – Multimedia DB{% endblock %}
+{% block content %}
+
+<div class="page-title">⬆️ Upload <span>Media File</span></div>
+
+<div class="card" style="max-width:620px">
+  <form method="POST" enctype="multipart/form-data">
+
+    <div class="form-group">
+      <label>Choose File</label>
+      <div class="drop-area" onclick="document.getElementById('fileInput').click()">
+        <div class="icon">📁</div>
+        <p id="fileLabel">Click to select a file (image, audio, video, or text)</p>
+        <input type="file" id="fileInput" name="file" style="display:none"
+               accept=".png,.jpg,.jpeg,.gif,.bmp,.webp,.mp3,.wav,.ogg,.flac,.mp4,.avi,.mov,.mkv,.webm,.txt,.pdf,.doc,.docx"
+               onchange="document.getElementById('fileLabel').textContent=this.files[0]?.name||'No file chosen'"/>
+      </div>
+      <small>Max file size: 50 MB. Supported: JPG/PNG/GIF (image), MP3/WAV (audio), MP4/AVI (video), TXT/PDF (text)</small>
+    </div>
+
+    <div class="form-group">
+      <label>Tags <span style="font-weight:400;color:#999">(optional)</span></label>
+      <input type="text" name="tags" placeholder="e.g. nature, music, lecture"/>
+      <small>Separate tags with commas. Tags help in searching later.</small>
+    </div>
+
+    <div class="form-group">
+      <label>Description <span style="font-weight:400;color:#999">(optional)</span></label>
+      <textarea name="description" rows="3" placeholder="A short description of this file..."></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Upload File</button>
+    <a href="{{ url_for('browse') }}" class="btn btn-secondary" style="margin-left:.7rem">Cancel</a>
+  </form>
+</div>
+
+{% endblock %}

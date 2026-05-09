@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Home – Multimedia DB{% endblock %}
+{% block content %}
+
+<div class="hero">
+  <h1>🎬 Multimedia Database System</h1>
+  <p>Store, manage, and query images, audio, video, and text files from one place.</p>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-box">
+    <div class="num">{{ stats.total }}</div>
+    <div class="lbl">Total Files</div>
+  </div>
+  <div class="stat-box image">
+    <div class="num">{{ stats.image }}</div>
+    <div class="lbl">🖼️ Images</div>
+  </div>
+  <div class="stat-box audio">
+    <div class="num">{{ stats.audio }}</div>
+    <div class="lbl">🎵 Audio</div>
+  </div>
+  <div class="stat-box video">
+    <div class="num">{{ stats.video }}</div>
+    <div class="lbl">🎥 Video</div>
+  </div>
+  <div class="stat-box text">
+    <div class="num">{{ stats.text }}</div>
+    <div class="lbl">📄 Text/Docs</div>
+  </div>
+</div>
+
+{% if recent %}
+<div class="card">
+  <h2>Recently Uploaded</h2>
+  <div class="media-grid">
+    {% for f in recent %}
+    <div class="media-card">
+      <div class="thumb">
+        {% if f['file_type'] == 'image' %}
+          <img src="{{ url_for('static', filename=f['file_path'][7:]) }}" alt="{{ f['file_name'] }}"/>
+        {% elif f['file_type'] == 'audio' %}🎵
+        {% elif f['file_type'] == 'video' %}🎥
+        {% else %}📄
+        {% endif %}
+      </div>
+      <div class="info">
+        <div class="name" title="{{ f['file_name'] }}">{{ f['file_name'] }}</div>
+        <div class="meta">{{ f['upload_date'][:10] }} · {{ f['file_size']|human_size }}</div>
+        {% if f['tags'] %}<div class="tags">🏷 {{ f['tags'] }}</div>{% endif %}
+      </div>
+      <div class="actions">
+        <a href="{{ url_for('view_file', file_id=f['id']) }}" class="btn-sm btn-view">View</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<div class="card" style="text-align:center;padding:3rem">
+  <p style="font-size:1.1rem;color:#888">No files yet. <a href="{{ url_for('upload') }}" style="color:#2e4bce">Upload your first file →</a></p>
+</div>
+{% endif %}
+
+<div class="card" style="background:#f5f7ff">
+  <h2>Quick Actions</h2>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:.5rem">
+    <a href="{{ url_for('upload') }}" class="btn btn-primary">⬆️ Upload File</a>
+    <a href="{{ url_for('browse') }}" class="btn btn-secondary">📂 Browse All</a>
+    <a href="{{ url_for('query_page') }}" class="btn btn-secondary">🔍 Run SQL Query</a>
+  </div>
+</div>
+
+{% endblock %}

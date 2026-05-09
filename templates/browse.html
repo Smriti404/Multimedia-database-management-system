@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Browse – Multimedia DB{% endblock %}
+{% block content %}
+
+<div class="page-title">📂 Browse <span>Media Files</span></div>
+
+<form method="GET">
+  <div class="filter-bar">
+    <input type="text" name="search" value="{{ search }}" placeholder="Search by name, tag, or description…"/>
+    <select name="sort" style="padding:.5rem .9rem;border:1.5px solid #ddd;border-radius:7px;font-size:.9rem;outline:none">
+      <option value="newest" {% if sort=='newest' %}selected{% endif %}>Newest First</option>
+      <option value="oldest" {% if sort=='oldest' %}selected{% endif %}>Oldest First</option>
+      <option value="name"   {% if sort=='name'   %}selected{% endif %}>Name A–Z</option>
+      <option value="size"   {% if sort=='size'   %}selected{% endif %}>Largest First</option>
+    </select>
+    <button type="submit" class="btn btn-primary" style="padding:.5rem 1.1rem">Search</button>
+    {% if search or file_type != 'all' %}
+    <a href="{{ url_for('browse') }}" class="btn btn-secondary" style="padding:.5rem 1rem">Clear</a>
+    {% endif %}
+  </div>
+  <div class="type-tabs" style="margin-bottom:1.2rem">
+    {% for t, label in [('all','All'), ('image','🖼️ Images'), ('audio','🎵 Audio'), ('video','🎥 Video'), ('text','📄 Text')] %}
+    <a href="?type={{ t }}{% if search %}&search={{ search }}{% endif %}"
+       class="type-tab {% if file_type == t %}active{% endif %}">{{ label }}</a>
+    {% endfor %}
+  </div>
+</form>
+
+<p style="color:#888;font-size:.9rem;margin-bottom:1rem">{{ count }} file(s) found</p>
+
+{% if files %}
+<div class="media-grid">
+  {% for f in files %}
+  <div class="media-card">
+    <div class="thumb">
+      {% if f['file_type'] == 'image' %}
+        <img src="{{ url_for('static', filename=f['file_path'][7:]) }}" alt="{{ f['file_name'] }}"/>
+      {% elif f['file_type'] == 'audio' %}🎵
+      {% elif f['file_type'] == 'video' %}🎥
+      {% else %}📄
+      {% endif %}
+    </div>
+    <div class="info">
+      <div class="name" title="{{ f['file_name'] }}">{{ f['file_name'] }}</div>
+      <div class="meta">
+        <span class="badge {{ f['file_type'] }}">{{ f['file_type'] }}</span>
+        · {{ f['file_size']|human_size }} · {{ f['upload_date'][:10] }}
+      </div>
+      {% if f['tags'] %}<div class="tags">🏷 {{ f['tags'] }}</div>{% endif %}
+    </div>
+    <div class="actions">
+      <a href="{{ url_for('view_file', file_id=f['id']) }}" class="btn-sm btn-view">View</a>
+      <form method="POST" action="{{ url_for('delete_file', file_id=f['id']) }}"
+            onsubmit="return confirm('Delete this file?')" style="display:inline">
+        <button type="submit" class="btn-sm btn-delete">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card" style="text-align:center;padding:3rem">
+  <p style="color:#888;font-size:1rem">No files found. Try a different search or <a href="{{ url_for('upload') }}" style="color:#2e4bce">upload a file</a>.</p>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}SQL Query – Multimedia DB{% endblock %}
+{% block content %}
+
+<div class="page-title">🔍 SQL <span>Query Console</span></div>
+
+<div class="card">
+  <p style="color:#555;font-size:.93rem;margin-bottom:1rem">
+    Run SELECT queries directly on the <code style="background:#eef0f8;padding:.1rem .4rem;border-radius:4px">media</code> table.
+    Only SELECT queries are allowed for safety.
+  </p>
+  <form method="POST">
+    <div class="form-group query-box">
+      <label>SQL Query</label>
+      <textarea name="sql" rows="5" placeholder="SELECT * FROM media WHERE file_type = 'image';">{{ sql }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">▶ Run Query</button>
+  </form>
+
+  <div style="margin-top:1.2rem">
+    <p style="font-size:.85rem;color:#888;margin-bottom:.5rem">Sample queries:</p>
+    <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+      {% for q in [
+        "SELECT * FROM media",
+        "SELECT * FROM media WHERE file_type = 'image'",
+        "SELECT * FROM media WHERE tags LIKE '%music%'",
+        "SELECT file_type, COUNT(*) as count FROM media GROUP BY file_type",
+        "SELECT * FROM media ORDER BY file_size DESC LIMIT 5",
+        "SELECT * FROM media WHERE upload_date >= date('now','-7 days')"
+      ] %}
+      <button type="button" class="btn-sm btn-view"
+              onclick="document.querySelector('textarea[name=sql]').value=this.dataset.q"
+              data-q="{{ q }}">{{ q[:45] }}{% if q|length > 45 %}…{% endif %}</button>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% if error %}
+<div class="error-box">⚠️ {{ error }}</div>
+{% endif %}
+
+{% if results %}
+<div class="card">
+  <h2>Results — {{ results|length }} row(s)</h2>
+  <div style="overflow-x:auto">
+    <table class="results-table">
+      <thead>
+        <tr>
+          {% for col in results[0].keys() %}
+          <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in results %}
+        <tr>
+          {% for val in row %}
+          <td>{{ val if val is not none else '—' }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% elif sql and not error %}
+<div class="card" style="text-align:center;padding:2rem;color:#888">No results returned.</div>
+{% endif %}
+
+<div class="card" style="background:#f5f7ff">
+  <h2 style="font-size:1rem">📋 Table Schema — <code>media</code></h2>
+  <table class="results-table" style="margin-top:.8rem">
+    <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>id</td><td>INTEGER</td><td>Auto-incremented primary key</td></tr>
+      <tr><td>file_name</td><td>TEXT</td><td>Name of the uploaded file</td></tr>
+      <tr><td>file_type</td><td>TEXT</td><td>Type: image / audio / video / text</td></tr>
+      <tr><td>file_path</td><td>TEXT</td><td>Path to the file on the server</td></tr>
+      <tr><td>file_size</td><td>INTEGER</td><td>File size in bytes</td></tr>
+      <tr><td>tags</td><td>TEXT</td><td>Comma-separated user tags</td></tr>
+      <tr><td>description</td><td>TEXT</td><td>Optional description</td></tr>
+      <tr><td>upload_date</td><td>TEXT</td><td>Date and time of upload</td></tr>
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
