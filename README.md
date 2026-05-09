@@ -1,8 +1,8 @@
 # Multimedia Database System
 ### DBMS Lab Project — IIT Kharagpur
 **Group Members:**
-- Sangeeta — 23CS30047
 - Smriti — 23CS30053
+- Sangeeta — 23CS30047
 
 ---
 
